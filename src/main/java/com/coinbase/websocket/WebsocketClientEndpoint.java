@@ -1,14 +1,7 @@
-package com.coinbase.websocketclient;
+package com.coinbase.websocket;
 
 import java.net.URI;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.ContainerProvider;
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import javax.websocket.*;
 
 @ClientEndpoint
 public class WebsocketClientEndpoint {
@@ -19,6 +12,7 @@ public class WebsocketClientEndpoint {
     public WebsocketClientEndpoint(URI endpointURI) {
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            container.setDefaultMaxTextMessageBufferSize(1000000);
             container.connectToServer(this, endpointURI);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -29,6 +23,13 @@ public class WebsocketClientEndpoint {
     public void onOpen(Session userSession) {
         System.out.println("opening websocket");
         this.userSession = userSession;
+    }
+
+    @OnError
+    public void onError(Throwable throwable) {
+//        System.out.println(message);
+//        this.userSession = null;
+        throwable.printStackTrace();
     }
 
     @OnClose
@@ -44,29 +45,14 @@ public class WebsocketClientEndpoint {
         }
     }
 
-    /**
-     * register message handler
-     *
-     * @param msgHandler
-     */
     public void addMessageHandler(MessageHandler msgHandler) {
         this.messageHandler = msgHandler;
     }
 
-    /**
-     * Send a message.
-     *
-     * @param message
-     */
     public void sendMessage(String message) {
         this.userSession.getAsyncRemote().sendText(message);
     }
 
-    /**
-     * Message handler.
-     *
-     * @author Jiji_Sasidharan
-     */
     public static interface MessageHandler {
 
         public void handleMessage(String message);
