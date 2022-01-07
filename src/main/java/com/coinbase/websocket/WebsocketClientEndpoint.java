@@ -3,8 +3,12 @@ package com.coinbase.websocket;
 import java.net.URI;
 import javax.websocket.*;
 
+import org.apache.log4j.Logger;
+
 @ClientEndpoint
 public class WebsocketClientEndpoint {
+
+    private static final Logger logger = Logger.getLogger(WebsocketClientEndpoint.class);
 
     Session userSession = null;
     private MessageHandler messageHandler;
@@ -15,26 +19,24 @@ public class WebsocketClientEndpoint {
             container.setDefaultMaxTextMessageBufferSize(1000000);
             container.connectToServer(this, endpointURI);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error("Exception: " + e);
         }
     }
 
     @OnOpen
     public void onOpen(Session userSession) {
-        System.out.println("opening websocket");
+        logger.info("Opening websocket");
         this.userSession = userSession;
     }
 
     @OnError
     public void onError(Throwable throwable) {
-//        System.out.println(message);
-//        this.userSession = null;
         throwable.printStackTrace();
     }
 
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
-        System.out.println("closing websocket");
+        logger.info("Closing websocket");
         this.userSession = null;
     }
 

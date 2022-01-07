@@ -3,6 +3,7 @@ package com.coinbase.websocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -10,6 +11,8 @@ import org.springframework.context.ApplicationListener;
 
 @SpringBootApplication
 public class Application implements ApplicationListener<ApplicationReadyEvent> {
+
+    private static final Logger logger = Logger.getLogger(Application.class);
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -42,22 +45,17 @@ public class Application implements ApplicationListener<ApplicationReadyEvent> {
 
     public static void websocketConnect() {
         try {
-            // open websocket
+            //Open websocket
             final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL));
 
-            // add listener
-            clientEndPoint.addMessageHandler(System.out::println);
+            //Add listener
+            clientEndPoint.addMessageHandler(logger::info);
 
-            // send message to websocket
+            //Send message to websocket
             clientEndPoint.sendMessage(JSON_SUBSCRIBE_MESSAGE);
 
-            // wait 5 seconds for messages from websocket
-//            Thread.sleep(5000);
-
-//        } catch (InterruptedException e) {
-//            System.err.println("Interrupted!" + e);
         } catch (URISyntaxException ex) {
-            System.err.println("Exception: " + ex.getMessage());
+            logger.error("Exception: " + ex.getMessage());
         }
     }
 }
