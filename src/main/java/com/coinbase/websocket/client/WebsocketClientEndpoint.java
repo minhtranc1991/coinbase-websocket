@@ -1,8 +1,10 @@
-package com.coinbase.websocket;
+package com.coinbase.websocket.client;
 
 import java.net.URI;
+import java.util.List;
 import javax.websocket.*;
 
+import com.coinbase.websocket.factory.OrderBookMessage;
 import org.apache.log4j.Logger;
 
 @ClientEndpoint
@@ -55,8 +57,9 @@ public class WebsocketClientEndpoint {
         this.userSession.getAsyncRemote().sendText(message);
     }
 
-    public static interface MessageHandler {
-
+    public interface MessageHandler {
         public void handleMessage(String message);
+
+        List<OrderBookMessage> getQueuedMessages(Long sequenceId);
     }
 }
